@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vim patches</title>
+    <link>http://vim-jp.org/</link>
+    <description>Unofficial vim patches feed</description>
+{{range .}}
+   <item>
+     <title>{{.Title}}</title>
+     <pubDate>{{.Created}}</pubDate>
+     <link>{{.Link}}</link>
+     <guid isPermaLink="true">{{.Id}}</guid>
+     <description>{{.Description}}</description>
+   </item>
+{{end}}
+  </channel>
+</rss>
