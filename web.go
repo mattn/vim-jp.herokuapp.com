@@ -127,12 +127,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	/*
-	*/
-		_, err = db.Exec("create table patches ( id serial primary key, name varchar default null unique, title varchar default null, description varchar default null, created_at timestamp default now());")
-		if err != nil {
-			log.Fatal(err)
-		}
+	_, err = db.Exec("create table patches ( id serial primary key, name varchar default null unique, title varchar default null, description varchar default null, created_at timestamp default now());")
+	if err != nil {
+		log.Println(err)
+	}
 	t, err := template.ParseFiles(filepath.Join(filepath.Dir(os.Args[0]), "feed.rss"))
 
 	http.Handle("/", http.FileServer(http.Dir(filepath.Join(filepath.Dir(os.Args[0]), "public"))))
