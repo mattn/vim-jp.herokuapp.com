@@ -118,7 +118,7 @@ func updatePatches(db *sql.DB) {
 func main() {
 	var mutex sync.Mutex
 
-	cs, err := pq.ParseURL(os.Getenv("HEROKU_POSTGRESQL_COBALT_URL"))
+	cs, err := pq.ParseURL(os.Getenv("HEROKU_POSTGRESQL_BLUE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +127,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	/* */
+	/*
+	*/
 		_, err = db.Exec("create table patches ( id serial primary key, name varchar default null unique, title varchar default null, description varchar default null, created_at timestamp default now());")
 		if err != nil {
 			log.Fatal(err)
