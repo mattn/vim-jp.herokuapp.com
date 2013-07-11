@@ -127,8 +127,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	/*
-	*/
+	/* */
 		_, err = db.Exec("create table patches ( id serial primary key, name varchar default null unique, title varchar default null, description varchar default null, created_at timestamp default now());")
 		if err != nil {
 			log.Fatal(err)
