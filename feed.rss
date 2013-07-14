@@ -9,7 +9,7 @@
      <title>{{.Title}}</title>
      <pubDate>{{.Created}}</pubDate>
      <link>{{.Link}}</link>
-     <guid isPermaLink="true">{{.Id}}</guid>
+     <guid isPermaLink="true">{{.Link}}</guid>
      <description>{{.Description}}</description>
    </item>
 {{end}}
