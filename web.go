@@ -83,18 +83,18 @@ func updatePatches(db *sql.DB) {
 
 	tp := regexp.MustCompile(`^\s+\d+\s+(\S+)\s+(.*)$`)
 
-	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("Failed to begin transaction: %s\n", err.Error())
 		return
 	}
-	defer tx.Commit()
 	sql := "insert into patches(name, title, description) values ($1, $2, $3)"
 	secret := os.Getenv("VIM_JP_PATCHES_SECRET")
 	for _, line := range lines {
+		tx, err := db.Begin()
 		parts := tp.FindAllStringSubmatch(line, 1)[0]
 		_, err = tx.Exec(sql, parts[1], parts[2], "")
 		if err == nil {
+			tx.Commit()
 			log.Println("Posting notification")
 			sha1h := sha1.New()
 			fmt.Fprint(sha1h, "vim_jp"+secret)
@@ -110,6 +110,7 @@ func updatePatches(db *sql.DB) {
 				log.Printf("Failed to post notify: %s", err.Error())
 			}
 		} else {
+			tx.Rollback()
 			log.Printf("DB: %s\n", err.Error())
 		}
 	}
