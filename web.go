@@ -83,14 +83,14 @@ func updatePatches(db *sql.DB) {
 
 	tp := regexp.MustCompile(`^\s+\d+\s+(\S+)\s+(.*)$`)
 
-	if err != nil {
-		log.Printf("Failed to begin transaction: %s\n", err.Error())
-		return
-	}
 	sql := "insert into patches(name, title, description) values ($1, $2, $3)"
 	secret := os.Getenv("VIM_JP_PATCHES_SECRET")
 	for _, line := range lines {
 		tx, err := db.Begin()
+		if err != nil {
+			log.Printf("Failed to begin transaction: %s\n", err.Error())
+			return
+		}
 		parts := tp.FindAllStringSubmatch(line, 1)[0]
 		_, err = tx.Exec(sql, parts[1], parts[2], "")
 		if err == nil {
