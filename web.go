@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-const uri = "http://ftp.vim.org/vim/unstable/patches/7.4a/"
+const uri = "http://ftp.vim.org/vim/unstable/patches/7.4b/"
 
 type Status struct {
 	Events []Event `json:"events"`
