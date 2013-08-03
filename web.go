@@ -202,8 +202,8 @@ func main() {
 		for {
 			time.Sleep(10 * time.Minute)
 			mutex.Lock()
+			defer mutex.Unlock()
 			updatePatches(db)
-			mutex.Unlock()
 		}
 	}()
 
