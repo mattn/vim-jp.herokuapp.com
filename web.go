@@ -161,7 +161,7 @@ func main() {
 		mutex.Lock()
 		defer mutex.Unlock()
 
-		sql := "select name, title, created_at from patches order by name desc limit 10"
+		sql := "select name, title, created_at from patches order by created_at desc limit 10"
 		rows, err := db.Query(sql)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
