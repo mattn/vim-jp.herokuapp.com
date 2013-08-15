@@ -213,7 +213,11 @@ func main() {
 		}
 		callback := r.URL.Query().Get("callback")
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, "%s(%s)", callback, string(b))
+		if callback != "" {
+			fmt.Fprintf(w, "%s(%s)", callback, string(b))
+		} else {
+			w.Write(b)
+		}
 	})
 
 	http.HandleFunc("/patches/pull", func(w http.ResponseWriter, r *http.Request) {
