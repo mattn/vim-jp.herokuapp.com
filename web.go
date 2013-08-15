@@ -21,6 +21,8 @@ import (
 
 const uri = "http://ftp.vim.org/vim/patches/7.4/"
 
+var mutex sync.Mutex
+
 type Status struct {
 	Events []Event `json:"events"`
 }
@@ -61,6 +63,9 @@ type FeedItem struct {
 }
 
 func updatePatches(db *sql.DB) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	log.Println("Updating patches")
 	doc, err := goquery.NewDocument(uri)
 	if err != nil {
@@ -117,6 +122,9 @@ func updatePatches(db *sql.DB) {
 }
 
 func feedItems(db *sql.DB) ([]FeedItem, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	sql := "select name, title, created_at from patches order by created_at desc limit 10"
 	rows, err := db.Query(sql)
 	if err != nil {
@@ -144,8 +152,6 @@ func feedItems(db *sql.DB) ([]FeedItem, error) {
 }
 
 func main() {
-	var mutex sync.Mutex
-
 	cs, err := pq.ParseURL(os.Getenv("HEROKU_POSTGRESQL_BLUE_URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -185,9 +191,6 @@ func main() {
 	})
 
 	http.HandleFunc("/patches/", func(w http.ResponseWriter, r *http.Request) {
-		mutex.Lock()
-		defer mutex.Unlock()
-
 		items, err := feedItems(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -198,9 +201,6 @@ func main() {
 	})
 
 	http.HandleFunc("/patches/json", func(w http.ResponseWriter, r *http.Request) {
-		mutex.Lock()
-		defer mutex.Unlock()
-
 		items, err := feedItems(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -217,8 +217,6 @@ func main() {
 	})
 
 	http.HandleFunc("/patches/pull", func(w http.ResponseWriter, r *http.Request) {
-		mutex.Lock()
-		defer mutex.Unlock()
 		updatePatches(db)
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("OK: " + uri))
@@ -227,8 +225,6 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(10 * time.Minute)
-			mutex.Lock()
-			defer mutex.Unlock()
 			updatePatches(db)
 		}
 	}()
