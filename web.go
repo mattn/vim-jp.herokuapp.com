@@ -116,6 +116,33 @@ func updatePatches(db *sql.DB) {
 	}
 }
 
+func feedItems(db *sql.DB) ([]FeedItem, error) {
+	sql := "select name, title, created_at from patches order by created_at desc limit 10"
+	rows, err := db.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := make([]FeedItem, 0)
+	for rows.Next() {
+		var name, title string
+		var created_at time.Time
+		err = rows.Scan(&name, &title, &created_at)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, FeedItem{
+			Id:          name,
+			Title:       name,
+			Link:        fmt.Sprintf("%s%s", uri, name),
+			Description: title,
+			CreatedAt:   created_at,
+		})
+	}
+	return items, nil
+}
+
 func main() {
 	var mutex sync.Mutex
 
@@ -161,30 +188,10 @@ func main() {
 		mutex.Lock()
 		defer mutex.Unlock()
 
-		sql := "select name, title, created_at from patches order by created_at desc limit 10"
-		rows, err := db.Query(sql)
+		items, err := feedItems(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
-		}
-		defer rows.Close()
-
-		items := make([]FeedItem, 0)
-		for rows.Next() {
-			var name, title string
-			var created_at time.Time
-			err = rows.Scan(&name, &title, &created_at)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			items = append(items, FeedItem{
-				Id:          name,
-				Title:       name,
-				Link:        fmt.Sprintf("%s%s", uri, name),
-				Description: title,
-				CreatedAt:   created_at,
-			})
 		}
 		w.Header().Set("Content-Type", "application/rss+xml")
 		t.Execute(w, items)
@@ -194,34 +201,19 @@ func main() {
 		mutex.Lock()
 		defer mutex.Unlock()
 
-		sql := "select name, title, created_at from patches order by created_at desc limit 10"
-		rows, err := db.Query(sql)
+		items, err := feedItems(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer rows.Close()
-
-		items := make([]FeedItem, 0)
-		for rows.Next() {
-			var name, title string
-			var created_at time.Time
-			err = rows.Scan(&name, &title, &created_at)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			items = append(items, FeedItem{
-				Id:          name,
-				Title:       name,
-				Link:        fmt.Sprintf("%s%s", uri, name),
-				Description: title,
-				CreatedAt:   created_at,
-			})
+		b, err := json.Marshal(items)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
-
+		callback := r.URL.Query().Get("callback")
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(items)
+		fmt.Fprint(w, "%s(%s)", callback, string(b))
 	})
 
 	http.HandleFunc("/patches/pull", func(w http.ResponseWriter, r *http.Request) {
