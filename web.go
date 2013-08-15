@@ -52,12 +52,12 @@ func handleEvents(events []Event) string {
 	return results
 }
 
-type Item struct {
-	Id          string
-	Title       string
-	Link        string
-	Description string
-	Created     time.Time
+type FeedItem struct {
+	Id          string `json:"id"`
+	Title       string `json:"title"`
+	Link        string `json:"link"`
+	Description string `json:"description"`
+	CreatedAt   time.Time `json:"created"`
 }
 
 func updatePatches(db *sql.DB) {
@@ -169,7 +169,7 @@ func main() {
 		}
 		defer rows.Close()
 
-		items := make([]Item, 0)
+		items := make([]FeedItem, 0)
 		for rows.Next() {
 			var name, title string
 			var created_at time.Time
@@ -178,16 +178,50 @@ func main() {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			items = append(items, Item{
+			items = append(items, FeedItem{
 				Id:          name,
 				Title:       name,
 				Link:        fmt.Sprintf("%s%s", uri, name),
 				Description: title,
-				Created:     created_at,
+				CreatedAt:   created_at,
 			})
 		}
 		w.Header().Set("Content-Type", "application/rss+xml")
 		t.Execute(w, items)
+	})
+
+	http.HandleFunc("/patches/json", func(w http.ResponseWriter, r *http.Request) {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		sql := "select name, title, created_at from patches order by created_at desc limit 10"
+		rows, err := db.Query(sql)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		items := make([]FeedItem, 0)
+		for rows.Next() {
+			var name, title string
+			var created_at time.Time
+			err = rows.Scan(&name, &title, &created_at)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			items = append(items, FeedItem{
+				Id:          name,
+				Title:       name,
+				Link:        fmt.Sprintf("%s%s", uri, name),
+				Description: title,
+				CreatedAt:   created_at,
+			})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(items)
 	})
 
 	http.HandleFunc("/patches/pull", func(w http.ResponseWriter, r *http.Request) {

@@ -7,7 +7,7 @@
 {{range .}}
    <item>
      <title>{{.Title}}</title>
-     <pubDate>{{.Created}}</pubDate>
+     <pubDate>{{.CreatedAt}}</pubDate>
      <link>{{.Link}}</link>
      <guid isPermaLink="true">{{.Link}}</guid>
      <description>{{.Description}}</description>
