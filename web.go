@@ -195,7 +195,7 @@ func main() {
 		defer mutex.Unlock()
 		updatePatches(db)
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("OK"))
+		w.Write([]byte("OK: " + uri))
 	})
 
 	go func() {
