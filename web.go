@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bmizerany/pq"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -198,6 +199,17 @@ func main() {
 		}
 		w.Header().Set("Content-Type", "application/rss+xml")
 		t.Execute(w, items)
+	})
+
+	http.HandleFunc("/vimmers", func(w http.ResponseWriter, r *http.Request) {
+		res, err := http.Get("https://raw.github.com/vim-jp/vim-jp.github.com/master/vimmers/vimmers.json")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer res.Body.Close()
+		w.Header().Set("Content-Type", "application/json")
+		io.Copy(w, res.Body)
 	})
 
 	http.HandleFunc("/patches/json", func(w http.ResponseWriter, r *http.Request) {
