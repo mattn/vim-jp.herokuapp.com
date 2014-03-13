@@ -8,6 +8,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bmizerany/pq"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -208,8 +209,18 @@ func main() {
 			return
 		}
 		defer res.Body.Close()
+		callback := r.FormValue("callback")
 		w.Header().Set("Content-Type", "application/json")
-		io.Copy(w, res.Body)
+		if callback != "" {
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			fmt.Fprintf(w, "%s(%s)", callback, string(b))
+		} else {
+			io.Copy(w, res.Body)
+		}
 	})
 
 	http.HandleFunc("/patches/json", func(w http.ResponseWriter, r *http.Request) {
