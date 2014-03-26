@@ -77,7 +77,7 @@ func updatePatches(db *sql.DB) {
 	lines := strings.Split(doc.Find("pre").Text(), "\n")
 	s, e := -1, -1
 	sp := regexp.MustCompile(`^\s+SIZE\s+NAME\s+FIXES$`)
-	ep := regexp.MustCompile(`^\s+\d`)
+	ep := regexp.MustCompile(`^\s*\d`)
 	for n, line := range lines {
 		if s == -1 && sp.MatchString(line) {
 			s = n
