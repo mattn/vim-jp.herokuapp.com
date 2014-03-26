@@ -88,7 +88,7 @@ func updatePatches(db *sql.DB) {
 	}
 	lines = lines[s+1 : e]
 
-	tp := regexp.MustCompile(`^\s+\d+\s+(\S+)\s+(.*)$`)
+	tp := regexp.MustCompile(`^\s*\d+\s+(\S+)\s+(.*)$`)
 
 	sql := "insert into patches(name, title, description) values ($1, $2, $3)"
 	secret := os.Getenv("VIM_JP_PATCHES_SECRET")
