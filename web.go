@@ -128,7 +128,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	sql := "select name, title, created_at from patches order by created_at desc limit ?"
+	sql := "select name, title, created_at from patches order by created_at desc limit $1"
 	rows, err := db.Query(sql, count)
 	if err != nil {
 		return nil, err
