@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"text/template"
@@ -123,12 +124,12 @@ func updatePatches(db *sql.DB) {
 	}
 }
 
-func feedItems(db *sql.DB) ([]FeedItem, error) {
+func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	sql := "select name, title, created_at from patches order by created_at desc limit 10"
-	rows, err := db.Query(sql)
+	sql := "select name, title, created_at from patches order by created_at desc limit $1"
+	rows, err := db.Query(sql, count)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +194,11 @@ func main() {
 	})
 
 	http.HandleFunc("/patches/", func(w http.ResponseWriter, r *http.Request) {
-		items, err := feedItems(db)
+		count, err := strconv.Atoi(r.FormValue("count"))
+		if err != nil || count < 1 {
+			count = 10
+		}
+		items, err := feedItems(db, count)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -224,7 +229,11 @@ func main() {
 	})
 
 	http.HandleFunc("/patches/json", func(w http.ResponseWriter, r *http.Request) {
-		items, err := feedItems(db)
+		count, err := strconv.Atoi(r.FormValue("count"))
+		if err != nil || count < 1 {
+			count = 10
+		}
+		items, err := feedItems(db, count)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
