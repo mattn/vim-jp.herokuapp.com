@@ -108,7 +108,7 @@ func updatePatches(db *sql.DB) {
 			params := make(url.Values)
 			params.Set("room", "vim")
 			params.Set("bot", "vim_jp")
-			params.Set("text", fmt.Sprintf("%s\n%s", parts[1], parts[2]))
+			params.Set("text", fmt.Sprintf("%s\n%s\n%s", parts[1], parts[2], uri + parts[1]))
 			params.Set("bot_verifier", fmt.Sprintf("%x", sha1h.Sum(nil)))
 			r, err := http.Get("http://lingr.com/api/room/say?" + params.Encode())
 			if err == nil {
