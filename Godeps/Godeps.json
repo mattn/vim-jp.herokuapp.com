@@ -1,0 +1,23 @@
+{
+	"ImportPath": "github.com/mattn/vim-jp.herokuapp.com",
+	"GoVersion": "devel +d4bb72b Thu May 7 16:21:57 2015 +0000",
+	"Deps": [
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v0.3.2-79-gb444041",
+			"Rev": "b4440419d81240f8451a505b2f806c853bc2befc"
+		},
+		{
+			"ImportPath": "github.com/andybalholm/cascadia",
+			"Rev": "6122e68c2642b7b75c538a63b15168c6c80fb757"
+		},
+		{
+			"ImportPath": "github.com/bmizerany/pq",
+			"Rev": "da2b95e392c172df0be322eadc19a90b0f771548"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "3cffabab72adf04f8e3b01c5baf775361837b5fe"
+		}
+	]
+}
