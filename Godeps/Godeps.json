@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/mattn/vim-jp.herokuapp.com",
-	"GoVersion": "devel +d4bb72b Thu May 7 16:21:57 2015 +0000",
+	"GoVersion": "go1.4.2",
 	"Deps": [
 		{
 			"ImportPath": "github.com/PuerkitoBio/goquery",
