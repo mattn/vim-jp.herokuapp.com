@@ -2,4 +2,4 @@
 
 http://vim-jp.herokuapp.com/
 
-Provies patches feed
+Provies patches feed, and json contents of vimmers
