@@ -58,10 +58,10 @@ func handleEvents(events []Event) string {
 }
 
 type FeedItem struct {
-	Id          string `json:"id"`
-	Title       string `json:"title"`
-	Link        string `json:"link"`
-	Description string `json:"description"`
+	Id          string    `json:"id"`
+	Title       string    `json:"title"`
+	Link        string    `json:"link"`
+	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created"`
 }
 
@@ -109,7 +109,7 @@ func updatePatches(db *sql.DB) {
 			params := make(url.Values)
 			params.Set("room", "vim")
 			params.Set("bot", "vim_jp")
-			params.Set("text", fmt.Sprintf("%s\n%s\n%s", parts[1], parts[2], uri + parts[1]))
+			params.Set("text", fmt.Sprintf("%s\n%s\n%s", parts[1], parts[2], uri+parts[1]))
 			params.Set("bot_verifier", fmt.Sprintf("%x", sha1h.Sum(nil)))
 			r, err := http.Get("http://lingr.com/api/room/say?" + params.Encode())
 			if err == nil {
@@ -208,7 +208,7 @@ func main() {
 	})
 
 	http.HandleFunc("/vimmers", func(w http.ResponseWriter, r *http.Request) {
-		res, err := http.Get("https://raw.github.com/vim-jp/vim-jp.github.com/master/vimmers/vimmers.json")
+		res, err := http.Get("https://raw.githubusercontent.com/vim-jp/vim-jp.github.com/master/vimmers/vimmers.json")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
