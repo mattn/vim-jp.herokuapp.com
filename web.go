@@ -1,17 +1,15 @@
 package main
 
 import (
-	"crypto/sha1"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/bmizerany/pq"
+	feed "github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/jteeuwen/go-pkg-rss"
+	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -70,57 +68,23 @@ func updatePatches(db *sql.DB) {
 	defer mutex.Unlock()
 
 	log.Println("Updating patches")
-	doc, err := goquery.NewDocument(uri)
-	if err != nil {
-		log.Printf("Failed to parse page: %s\n", err.Error())
-		return
-	}
-	lines := strings.Split(doc.Find("pre").Text(), "\n")
-	s, e := -1, -1
-	sp := regexp.MustCompile(`^\s+SIZE\s+NAME\s+FIXES$`)
-	ep := regexp.MustCompile(`^\s*\d`)
-	for n, line := range lines {
-		if s == -1 && sp.MatchString(line) {
-			s = n
-		} else if s != -1 && e == -1 && !ep.MatchString(line) {
-			e = n
-			break
-		}
-	}
-	lines = lines[s+1 : e]
-
-	tp := regexp.MustCompile(`^\s*\d+\s+(\S+)\s+(.*)$`)
 
 	sql := "insert into patches(name, title, description) values ($1, $2, $3)"
-	secret := os.Getenv("VIM_JP_PATCHES_SECRET")
-	for _, line := range lines {
-		tx, err := db.Begin()
-		if err != nil {
-			log.Printf("Failed to begin transaction: %s\n", err.Error())
-			return
-		}
-		parts := tp.FindAllStringSubmatch(line, 1)[0]
-		_, err = tx.Exec(sql, parts[1], parts[2], "")
-		if err == nil {
-			tx.Commit()
-			log.Println("Posting notification")
-			sha1h := sha1.New()
-			fmt.Fprint(sha1h, "vim_jp"+secret)
-			params := make(url.Values)
-			params.Set("room", "vim")
-			params.Set("bot", "vim_jp")
-			params.Set("text", fmt.Sprintf("%s\n%s\n%s", parts[1], parts[2], uri+parts[1]))
-			params.Set("bot_verifier", fmt.Sprintf("%x", sha1h.Sum(nil)))
-			r, err := http.Get("http://lingr.com/api/room/say?" + params.Encode())
-			if err == nil {
-				r.Body.Close()
-			} else {
-				log.Printf("Failed to post notify: %s", err.Error())
+	reConetnt := regexp.MustCompile(`<[^>]*>`)
+
+	err := feed.New(5, true, nil,
+		func(feed *feed.Feed, ch *feed.Channel, items []*feed.Item) {
+			for _, item := range items {
+				content := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
+				name := strings.Split(strings.Split(content, "\n")[0], " ")[1]
+				if _, err := db.Exec(sql, name, content, ""); err != nil {
+					log.Println(err)
+				}
 			}
-		} else {
-			tx.Rollback()
-			log.Printf("DB: %s\n", err.Error())
-		}
+		},
+	).Fetch("https://github.com/vim/vim/commits/master.atom", nil)
+	if err != nil {
+		log.Println(err)
 	}
 }
 

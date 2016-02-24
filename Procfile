@@ -1,1 +1,1 @@
-web: vim-jp.herokuapp.com
+web: vim-jp
