@@ -99,6 +99,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 	}
 	defer rows.Close()
 
+	re := regexp.MustCompile(`^patch[^\n]+\n`)
 	items := make([]FeedItem, 0)
 	for rows.Next() {
 		var name, title string
@@ -107,6 +108,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 		if err != nil {
 			return nil, err
 		}
+		name = re.ReplaceAllString(name, "")
 		items = append(items, FeedItem{
 			Id:          name,
 			Title:       name,
