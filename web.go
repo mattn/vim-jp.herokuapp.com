@@ -108,7 +108,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		name = re.ReplaceAllString(name, "")
+		title = re.ReplaceAllString(title, "")
 		items = append(items, FeedItem{
 			Id:          name,
 			Title:       name,
