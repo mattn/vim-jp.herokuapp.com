@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	feed "github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/jteeuwen/go-pkg-rss"
-	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
 	"io"
 	"io/ioutil"
 	"log"
@@ -18,11 +16,17 @@ import (
 	"sync"
 	"text/template"
 	"time"
+
+	feed "github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/jteeuwen/go-pkg-rss"
+	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
 )
 
 const uri = "http://ftp.vim.org/vim/patches/7.4/"
 
-var mutex sync.Mutex
+var (
+	mutex sync.Mutex
+	re    = regexp.MustCompile(`^[0-9]+\.[0-9]+`)
+)
 
 type Status struct {
 	Events []Event `json:"events"`
@@ -75,8 +79,11 @@ func updatePatches(db *sql.DB) {
 	err := feed.New(5, true, nil,
 		func(feed *feed.Feed, ch *feed.Channel, items []*feed.Item) {
 			for _, item := range items {
-				content := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
 				name := strings.Split(strings.Split(content, "\n")[0], " ")[1]
+				if !re.MatchString(name) {
+					continue
+				}
+				content := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
 				if _, err := db.Exec(sql, name, content, ""); err != nil {
 					log.Println(err)
 				}
