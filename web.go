@@ -119,11 +119,11 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 			return nil, err
 		}
 		title = re.ReplaceAllString(title, "")
-		ver := strings.SplitN(name, ".", 2)
+		ver := strings.Join(strings.Split(name, ".")[:2], ".")
 		items = append(items, FeedItem{
 			Id:          name,
 			Title:       name,
-			Link:        fmt.Sprintf("%s/%s/%s", uri, strings.Join(ver, "."), name),
+			Link:        fmt.Sprintf("%s/%s/%s", uri, ver, name),
 			Description: title,
 			CreatedAt:   created_at,
 		})
