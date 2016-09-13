@@ -21,11 +21,6 @@ import (
 	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
 )
 
-const (
-	version = "8.0"
-	uri     = "http://ftp.vim.org/vim/patches"
-)
-
 var (
 	mutex sync.Mutex
 	re    = regexp.MustCompile(`^[0-9]+\.[0-9]+`)
@@ -123,7 +118,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 		items = append(items, FeedItem{
 			Id:          name,
 			Title:       name,
-			Link:        fmt.Sprintf("%s/%s/%s", uri, ver, name),
+			Link:        "https://github.com/vim/vim/releases/tag/v" + name,
 			Description: title,
 			CreatedAt:   created_at,
 		})
@@ -232,7 +227,7 @@ func main() {
 	http.HandleFunc("/patches/pull", func(w http.ResponseWriter, r *http.Request) {
 		updatePatches(db)
 		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("OK: " + uri + "/" + version))
+		w.Write([]byte("OK"))
 	})
 
 	go func() {
