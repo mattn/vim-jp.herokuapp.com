@@ -114,7 +114,6 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 			return nil, err
 		}
 		title = re.ReplaceAllString(title, "")
-		ver := strings.Join(strings.Split(name, ".")[:2], ".")
 		items = append(items, FeedItem{
 			Id:          name,
 			Title:       name,
