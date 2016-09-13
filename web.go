@@ -113,6 +113,9 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 		if err != nil {
 			return nil, err
 		}
+		if name == "8.0" {
+			name = "8.0.0000"
+		}
 		title = re.ReplaceAllString(title, "")
 		items = append(items, FeedItem{
 			Id:          name,
