@@ -21,7 +21,7 @@ import (
 	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
 )
 
-const uri = "http://ftp.vim.org/vim/patches/7.4/"
+const uri = "http://ftp.vim.org/vim/patches/8.0/"
 
 var (
 	mutex sync.Mutex
