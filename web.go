@@ -78,7 +78,7 @@ func updatePatches(db *sql.DB) {
 		func(feed *feed.Feed, ch *feed.Channel, items []*feed.Item) {
 			for _, item := range items {
 				content := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
-				name := strings.Split(strings.Split(content, "\n")[0], " ")[1]
+				name := strings.Trim(strings.Split(strings.Split(content, "\n")[0], " ")[1], " :")
 				if !re.MatchString(name) {
 					continue
 				}
