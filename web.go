@@ -71,18 +71,18 @@ func updatePatches(db *sql.DB) {
 
 	log.Println("Updating patches")
 
-	sql := "insert into patches(name, title, description) values ($1, $2, $3)"
+	sql := "insert into patches(title, description) values ($1, $2)"
 	reConetnt := regexp.MustCompile(`<[^>]*>`)
 
 	err := feed.New(5, true, nil,
 		func(feed *feed.Feed, ch *feed.Channel, items []*feed.Item) {
 			for _, item := range items {
-				content := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
-				name := strings.Trim(strings.Split(strings.Split(content, "\n")[0], " ")[1], " :")
-				if !re.MatchString(name) {
+				title := strings.Trim(strings.Split(strings.Split(content, "\n")[0], " ")[1], " :")
+				if !re.MatchString(title) {
 					continue
 				}
-				if _, err := db.Exec(sql, name, content, ""); err != nil {
+				description := strings.TrimSpace(reConetnt.ReplaceAllString(item.Content.Text, "")) + "\n"
+				if _, err := db.Exec(sql, title, description, ""); err != nil {
 					log.Println(err)
 				}
 			}
@@ -97,7 +97,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	sql := "select name, title, created_at from patches order by created_at desc limit $1"
+	sql := "select title, description, created_at from patches order by created_at desc limit $1"
 	rows, err := db.Query(sql, count)
 	if err != nil {
 		return nil, err
@@ -107,21 +107,21 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 	re := regexp.MustCompile(`^patch[^\n]+\n`)
 	items := make([]FeedItem, 0)
 	for rows.Next() {
-		var name, title string
+		var title, description string
 		var created_at time.Time
-		err = rows.Scan(&name, &title, &created_at)
+		err = rows.Scan(&title, &description, &created_at)
 		if err != nil {
 			return nil, err
 		}
-		if name == "8.0" {
-			name = "8.0.0000"
+		if title == "8.0" {
+			title = "8.0.0000"
 		}
 		title = re.ReplaceAllString(title, "")
 		items = append(items, FeedItem{
-			Id:          name,
-			Title:       name,
+			Id:          title,
+			Title:       title,
 			Link:        "https://github.com/vim/vim/releases/tag/v" + name,
-			Description: title,
+			Description: description,
 			CreatedAt:   created_at,
 		})
 	}
