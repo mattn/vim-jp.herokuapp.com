@@ -120,7 +120,7 @@ func feedItems(db *sql.DB, count int) ([]FeedItem, error) {
 		items = append(items, FeedItem{
 			Id:          title,
 			Title:       title,
-			Link:        "https://github.com/vim/vim/releases/tag/v" + name,
+			Link:        "https://github.com/vim/vim/releases/tag/v" + title,
 			Description: description,
 			CreatedAt:   created_at,
 		})
