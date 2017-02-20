@@ -82,7 +82,7 @@ func updatePatches(db *sql.DB) {
 				if !re.MatchString(title) {
 					continue
 				}
-				if _, err := db.Exec(sql, title, description, ""); err != nil {
+				if _, err := db.Exec(sql, title, description); err != nil {
 					log.Println(err)
 				}
 			}
