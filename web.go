@@ -65,6 +65,16 @@ type FeedItem struct {
 	CreatedAt   time.Time `json:"created"`
 }
 
+type GitRef struct {
+	Ref    string `json:"ref"`
+	URL    string `json:"url"`
+	Object struct {
+		Type string `json:"type"`
+		Sha  string `json:"sha"`
+		URL  string `json:"url"`
+	} `json:"object"`
+}
+
 func updatePatches(db *sql.DB) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -145,6 +155,31 @@ func main() {
 	t, err := template.ParseFiles(filepath.Join(filepath.Dir(os.Args[0]), "feed.rss"))
 
 	http.Handle("/", http.FileServer(http.Dir(filepath.Join(filepath.Dir(os.Args[0]), "public"))))
+
+	http.HandleFunc("/slack", func(w http.ResponseWriter, r *http.Request) {
+		v := regexp.MustCompile(`^!patch\s+(\S*)`).FindStringSubmatch(r.FormValue("text"))
+		if len(v) > 2 {
+			res, err := http.Get("https://api.github.com/repos/vim/vim/git/refs/tags/v" + v[1])
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			defer resp.Body.Close()
+
+			var ref GitRef
+			err := json.NewDecoder(resp.Body).Decode(&ref)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			json.NewEncoder(w).Encode(&struct {
+				Text string `json:"text"`
+			}{
+				Text: "https://github.com/vim/vim/commit/" + ref.Object.Sha,
+			})
+		}
+	})
+
 	http.HandleFunc("/lingr", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "bad request", http.StatusBadRequest)
