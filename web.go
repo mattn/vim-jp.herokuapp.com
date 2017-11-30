@@ -159,7 +159,7 @@ func main() {
 	http.HandleFunc("/slack", func(w http.ResponseWriter, r *http.Request) {
 		v := regexp.MustCompile(`^!patch\s+(\S*)`).FindStringSubmatch(r.FormValue("text"))
 		if len(v) > 2 {
-			res, err := http.Get("https://api.github.com/repos/vim/vim/git/refs/tags/v" + v[1])
+			resp, err := http.Get("https://api.github.com/repos/vim/vim/git/refs/tags/v" + v[1])
 			if err != nil {
 				log.Println(err)
 				return
@@ -167,7 +167,7 @@ func main() {
 			defer resp.Body.Close()
 
 			var ref GitRef
-			err := json.NewDecoder(resp.Body).Decode(&ref)
+			err = json.NewDecoder(resp.Body).Decode(&ref)
 			if err != nil {
 				log.Println(err)
 				return
