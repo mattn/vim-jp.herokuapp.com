@@ -166,18 +166,13 @@ func main() {
 			}
 			defer resp.Body.Close()
 
-			var refs []GitRef
-			err = json.NewDecoder(resp.Body).Decode(&refs)
+			var ref GitRef
+			err = json.NewDecoder(resp.Body).Decode(&ref)
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			var text string
-			if len(refs) == 0 {
-				text = "not found"
-			} else {
-				text = "https://github.com/vim/vim/commit/" + refs[0].Object.Sha
-			}
+			text := "https://github.com/vim/vim/commit/" + ref.Object.Sha
 			json.NewEncoder(w).Encode(&struct {
 				Text string `json:"text"`
 			}{
