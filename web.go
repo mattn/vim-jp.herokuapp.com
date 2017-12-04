@@ -162,6 +162,11 @@ func main() {
 			resp, err := http.Get("https://api.github.com/repos/vim/vim/git/refs/tags/v" + v[1])
 			if err != nil {
 				log.Println(err)
+				json.NewEncoder(w).Encode(&struct {
+					Text string `json:"text"`
+				}{
+					Text: "not found",
+				})
 				return
 			}
 			defer resp.Body.Close()
@@ -170,6 +175,11 @@ func main() {
 			err = json.NewDecoder(resp.Body).Decode(&ref)
 			if err != nil {
 				log.Println(err)
+				json.NewEncoder(w).Encode(&struct {
+					Text string `json:"text"`
+				}{
+					Text: "bad request",
+				})
 				return
 			}
 			text := "https://github.com/vim/vim/commit/" + ref.Object.Sha
