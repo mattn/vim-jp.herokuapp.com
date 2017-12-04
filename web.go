@@ -173,12 +173,11 @@ func main() {
 
 			var ref GitRef
 			err = json.NewDecoder(resp.Body).Decode(&ref)
-			if err != nil {
-				log.Println(err)
+			if err != nil || ref.Object.Sha == "" {
 				json.NewEncoder(w).Encode(&struct {
 					Text string `json:"text"`
 				}{
-					Text: "bad request",
+					Text: "not found",
 				})
 				return
 			}
