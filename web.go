@@ -17,8 +17,8 @@ import (
 	"text/template"
 	"time"
 
-	feed "github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/jteeuwen/go-pkg-rss"
-	"github.com/mattn/heroku/vim-jp/Godeps/_workspace/src/github.com/lib/pq"
+	"github.com/lib/pq"
+	feed "github.com/mattn/go-pkg-rss"
 )
 
 var (

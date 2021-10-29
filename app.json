@@ -1,0 +1,8 @@
+{
+  "name": "vim-jp.herokuapp.com",
+  "description": "vim のパッチ番号をサーブするサービス",
+  "repository": "https://github.com/mattn/vim-jp.herokuapp.com.git",
+  "image": "heroku/go:1.16",
+  "mount_dir": "src/github.com/mattn/vim-jp.herokuapp.com",
+  "keywords": ["golang"]
+}

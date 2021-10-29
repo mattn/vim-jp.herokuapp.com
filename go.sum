@@ -1,0 +1,6 @@
+github.com/lib/pq v0.0.0-20160107222132-2d785ad24be7 h1:Txezr4dcpoNSSnQ4fEnb1ZCmp8xoykx0MvaEjHuEYvI=
+github.com/lib/pq v0.0.0-20160107222132-2d785ad24be7/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+github.com/mattn/go-pkg-rss v0.0.0-20180208005446-cb3c88c0b82e h1:8i881aaEvrd0YvREvVDnzpRIy6iBMx7yg4/d0fMcQX4=
+github.com/mattn/go-pkg-rss v0.0.0-20180208005446-cb3c88c0b82e/go.mod h1:OWvwUgdpV1+T+Fb7DqMhavbKo6fRxvvXFhkLl9Mrabc=
+github.com/mattn/go-pkg-xmlx v0.0.0-20180208005205-db53493302d1 h1:eQlraMPqzwTnbVvXCjYc7qtM4YD28Jzpi+yJpRoEXuY=
+github.com/mattn/go-pkg-xmlx v0.0.0-20180208005205-db53493302d1/go.mod h1:XWCh1U/xVm5fUTUjyl3JJ83f1xLyJRMuwH0T1HYNgsA=
